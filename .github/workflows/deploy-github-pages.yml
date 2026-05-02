@@ -5,8 +5,11 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
+# Explicit permissions disable the rest; `actions: write` is required for
+# `upload-pages-artifact` (uses actions/upload-artifact under the hood).
 permissions:
   contents: read
+  actions: write
   pages: write
   id-token: write
 
