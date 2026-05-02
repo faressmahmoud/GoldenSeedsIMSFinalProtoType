@@ -26,11 +26,17 @@ jobs:
         with:
           node-version: '20'
           cache: npm
+      # CI often sets NODE_ENV=production; then `npm ci` skips devDependencies and
+      # `tsc` / `vite` are missing → build exits 1. Force dev install, then prod build.
       - name: Install dependencies
         run: npm ci
+        env:
+          NODE_ENV: development
       # Project site: /<repo>/ ; user site repo named *.github.io uses / .
       # (No `set -u`: npm child scripts can trip nounset on some runners.)
       - name: Build site for Pages
+        env:
+          NODE_ENV: production
         run: |
           set -eo pipefail
           REPO_NAME="${{ github.event.repository.name }}"
