@@ -24,14 +24,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: npm
-      # CI often sets NODE_ENV=production; then `npm ci` skips devDependencies and
-      # `tsc` / `vite` are missing → build exits 1. Force dev install, then prod build.
+          node-version: '22'
+      # GitHub sets NODE_ENV=production / NPM_CONFIG_PRODUCTION in many workflows;
+      # plain `npm ci` then skips devDependencies → no `tsc`/`vite`. `--include=dev` is definitive.
       - name: Install dependencies
-        run: npm ci
-        env:
-          NODE_ENV: development
+        run: npm ci --include=dev
       # Project site: /<repo>/ ; user site repo named *.github.io uses / .
       # (No `set -u`: npm child scripts can trip nounset on some runners.)
       - name: Build site for Pages
@@ -57,6 +54,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     permissions:
+      contents: read
+      actions: read
       pages: write
       id-token: write
     environment:
